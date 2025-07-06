@@ -199,6 +199,78 @@ $(document).ready(function() {
         }, 5000);
     });
 
+    // Success popup functionality
+    function showSuccessPopup(message, title = 'Success!') {
+        // Create popup HTML
+        var popupHTML = `
+            <div class="modal fade" id="successPopup" tabindex="-1" aria-labelledby="successPopupLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="successPopupLabel">
+                                <i class="fas fa-check-circle me-2"></i>${title}
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                            </div>
+                            <p class="lead mb-0">${message}</p>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remove existing popup if any
+        $('#successPopup').remove();
+        
+        // Add popup to body
+        $('body').append(popupHTML);
+        
+        // Show popup
+        var popup = new bootstrap.Modal(document.getElementById('successPopup'));
+        popup.show();
+        
+        // Auto-hide after 3 seconds
+        setTimeout(function() {
+            popup.hide();
+        }, 3000);
+    }
+
+    // Check for success messages and show popup
+    if ($('.alert-success').length > 0) {
+        var successMessage = $('.alert-success').first().text().trim();
+        showSuccessPopup(successMessage);
+    }
+
+    // Contact form success handling
+    $('form').on('submit', function(e) {
+        var form = $(this);
+        var submitBtn = form.find('button[type="submit"]');
+        
+        // Check if this is contact form
+        if (form.find('input[name="name"], input[name="email"], textarea[name="message"]').length > 0) {
+            // This is likely a contact form
+            var originalText = submitBtn.html();
+            submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Sending...');
+            submitBtn.prop('disabled', true);
+            
+            // Re-enable button after form submission
+            setTimeout(function() {
+                submitBtn.html(originalText);
+                submitBtn.prop('disabled', false);
+            }, 3000);
+        }
+    });
+
+    // Global success popup function
+    window.showSuccessPopup = showSuccessPopup;
+
     // Initialize any additional plugins or features
     console.log('Fashion Store initialized successfully!');
 }); 

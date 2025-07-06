@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, ProductImage, Cart, CartItem, Order, OrderItem
+from .models import Category, Product, ProductImage, Cart, CartItem, Order, OrderItem, Contact
 
 
 class ProductImageInline(admin.TabularInline):
@@ -115,4 +115,25 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['order', 'product', 'quantity', 'price', 'size', 'color', 'get_total_price']
     list_filter = ['size', 'color']
     search_fields = ['order__order_number', 'product__name']
-    readonly_fields = ['get_total_price'] 
+    readonly_fields = ['get_total_price']
+
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'subject', 'is_read', 'created_at']
+    list_filter = ['is_read', 'created_at']
+    search_fields = ['name', 'email', 'subject', 'message']
+    readonly_fields = ['created_at']
+    list_per_page = 20
+    
+    actions = ['mark_as_read', 'mark_as_unread']
+    
+    def mark_as_read(self, request, queryset):
+        updated = queryset.update(is_read=True)
+        self.message_user(request, f'{updated} contact messages marked as read.')
+    mark_as_read.short_description = "✅ Mark selected messages as read"
+    
+    def mark_as_unread(self, request, queryset):
+        updated = queryset.update(is_read=False)
+        self.message_user(request, f'{updated} contact messages marked as unread.')
+    mark_as_unread.short_description = "📧 Mark selected messages as unread" 

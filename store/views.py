@@ -341,6 +341,9 @@ def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
+            # Save contact form to database
+            contact = form.save()
+            
             # Send email to admin
             subject = f"New Contact Form Submission from {form.cleaned_data['name']}"
             message = f"""
@@ -353,6 +356,9 @@ def contact(request):
             Message: {form.cleaned_data['message']}
             
             Date: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}
+            Contact ID: {contact.id}
+            
+            Admin Panel: http://127.0.0.1:8000/admin/store/contact/{contact.id}/change/
             """
             
             try:
@@ -363,9 +369,9 @@ def contact(request):
                     [settings.ADMIN_EMAIL],  # आपका email
                     fail_silently=False,
                 )
-                messages.success(request, 'Your message has been sent successfully!')
+                messages.success(request, 'Your message has been sent successfully! We will get back to you soon.')
             except Exception as e:
-                messages.error(request, f'Failed to send message: {str(e)}')
+                messages.warning(request, f'Message saved but email could not be sent: {str(e)}')
             
             return redirect('store:contact')
     else:
