@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - Fashion Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary">About Us</h1>
+                <p class="lead text-muted">Discover our story and mission</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-tshirt fa-3x text-primary mb-3"></i>
+                            <h4>Our Mission</h4>
+                            <p class="text-muted">To provide high-quality fashion products that inspire confidence and style in every individual.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-heart fa-3x text-primary mb-3"></i>
+                            <h4>Our Vision</h4>
+                            <p class="text-muted">To become the leading destination for fashion enthusiasts seeking quality, style, and affordability.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-5">
+                <h3 class="text-center mb-4">Our Story</h3>
+                <p class="text-muted text-center">
+                    Founded in 2024, our fashion store has been dedicated to bringing the latest trends and timeless classics to our customers. 
+                    We believe that everyone deserves to look and feel their best, which is why we carefully curate our collection to include 
+                    pieces that are both stylish and comfortable.
+                </p>
+                <p class="text-muted text-center">
+                    Our team of fashion experts works tirelessly to ensure that every product meets our high standards for quality and design. 
+                    We source materials from trusted suppliers and work with skilled artisans to create pieces that you'll love to wear.
+                </p>
+            </div>
+            
+            <div class="row mt-5 g-4">
+                <div class="col-md-4 text-center">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-shipping-fast fa-2x text-primary"></i>
+                    </div>
+                    <h5>Fast Shipping</h5>
+                    <p class="text-muted small">Quick and reliable delivery to your doorstep</p>
+                </div>
+                
+                <div class="col-md-4 text-center">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-medal fa-2x text-primary"></i>
+                    </div>
+                    <h5>Quality Guarantee</h5>
+                    <p class="text-muted small">Premium quality products with satisfaction guarantee</p>
+                </div>
+                
+                <div class="col-md-4 text-center">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-headset fa-2x text-primary"></i>
+                    </div>
+                    <h5>24/7 Support</h5>
+                    <p class="text-muted small">Round-the-clock customer support for your needs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

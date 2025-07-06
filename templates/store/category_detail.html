@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - Fashion Store{% endblock %}
+
+{% block content %}
+<!-- CSRF Token for AJAX requests -->
+{% csrf_token %}
+
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Category Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ category.name }}</h1>
+            {% if category.description %}
+            <p class="text-muted">{{ category.description }}</p>
+            {% endif %}
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="text-muted">{{ products.paginator.count }} products</span>
+        </div>
+    </div>
+
+    <!-- Category Image (if available) -->
+    {% if category.image %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-fluid rounded" style="max-height: 300px; width: 100%; object-fit: cover;">
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Products Grid -->
+    {% if products %}
+    <div class="row">
+        {% for product in products %}
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card product-card h-100">
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                    <i class="fas fa-tshirt fa-3x text-muted"></i>
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.description|truncatewords:15 }}</p>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="h5 mb-0">₹{{ product.get_current_price }}</span>
+                            {% if product.is_on_sale %}
+                            <span class="badge bg-danger">Sale</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary flex-fill">View Details</a>
+                            <button class="btn btn-primary add-to-cart-btn" data-product-id="{{ product.id }}">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if products.has_other_pages %}
+    <nav aria-label="Category pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if products.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for num in products.paginator.page_range %}
+            {% if products.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            
+            {% if products.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <!-- No Products Found -->
+    <div class="text-center py-5">
+        <i class="fas fa-box-open fa-5x text-muted mb-4"></i>
+        <h3>No products found in this category</h3>
+        <p class="text-muted mb-4">We're working on adding more products to this category.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary">Browse All Products</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Get CSRF token from the page
+    function getCSRFToken() {
+        return $('[name=csrfmiddlewaretoken]').val();
+    }
+    
+    $('.add-to-cart-btn').click(function() {
+        var productId = $(this).data('product-id');
+        var quantity = 1; // Default quantity
+        var button = $(this);
+        
+        // Disable button to prevent multiple clicks
+        button.prop('disabled', true);
+        button.html('<i class="fas fa-spinner fa-spin"></i>');
+        
+        $.ajax({
+            url: '/add-to-cart/' + productId + '/',
+            method: 'POST',
+            data: {
+                'quantity': quantity,
+                'csrfmiddlewaretoken': getCSRFToken()
+            },
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#cartCount').text(response.cart_total);
+                    // Show success message
+                    button.html('<i class="fas fa-check"></i>');
+                    setTimeout(function() {
+                        button.html('<i class="fas fa-cart-plus"></i>');
+                        button.prop('disabled', false);
+                    }, 1000);
+                    
+                    // Show success alert
+                    alert(response.message);
+                } else {
+                    alert('Error: ' + response.message);
+                    button.html('<i class="fas fa-cart-plus"></i>');
+                    button.prop('disabled', false);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', xhr.responseText);
+                alert('Error adding product to cart. Please try again.');
+                button.html('<i class="fas fa-cart-plus"></i>');
+                button.prop('disabled', false);
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

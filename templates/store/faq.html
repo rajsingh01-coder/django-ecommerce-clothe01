@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions - Fashion Store{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        Frequently Asked Questions
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-lightbulb me-2"></i>Can't find your answer?</h5>
+                        <p class="mb-0">Contact our customer support team and we'll be happy to help!</p>
+                    </div>
+
+                    <div class="accordion" id="faqAccordion">
+                        <!-- Ordering -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                    <i class="fas fa-shopping-cart me-2 text-primary"></i>
+                                    How do I place an order?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Placing an order is easy! Simply browse our products, add items to your cart, and proceed to checkout. You'll need to create an account or sign in to complete your purchase.</p>
+                                    <ul>
+                                        <li>Browse products and add to cart</li>
+                                        <li>Review your cart and proceed to checkout</li>
+                                        <li>Enter shipping and billing information</li>
+                                        <li>Choose payment method and complete order</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                    <i class="fas fa-credit-card me-2 text-success"></i>
+                                    What payment methods do you accept?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>We accept all major payment methods:</p>
+                                    <ul>
+                                        <li>Credit/Debit Cards (Visa, MasterCard, American Express)</li>
+                                        <li>UPI (Google Pay, PhonePe, Paytm)</li>
+                                        <li>Net Banking</li>
+                                        <li>Digital Wallets</li>
+                                        <li>Cash on Delivery (COD)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                    <i class="fas fa-truck me-2 text-warning"></i>
+                                    How long does shipping take?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Shipping times vary based on your location and chosen shipping method:</p>
+                                    <ul>
+                                        <li><strong>Standard Shipping:</strong> 3-5 business days</li>
+                                        <li><strong>Express Shipping:</strong> 1-2 business days</li>
+                                        <li><strong>Free Shipping:</strong> Available on orders above ₹999</li>
+                                    </ul>
+                                    <p class="mb-0">Orders placed before 2 PM are processed the same day.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Returns -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                    <i class="fas fa-undo-alt me-2 text-danger"></i>
+                                    What is your return policy?
+                                </button>
+                            </h2>
+                            <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>We offer a 30-day return policy for most items:</p>
+                                    <ul>
+                                        <li>Items must be in original condition</li>
+                                        <li>Original tags must be attached</li>
+                                        <li>Free return shipping</li>
+                                        <li>Refunds processed within 3-5 business days</li>
+                                    </ul>
+                                    <p class="mb-0">Some items like sale items and personalized products may not be eligible for returns.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sizing -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                                    <i class="fas fa-ruler me-2 text-info"></i>
+                                    How do I find the right size?
+                                </button>
+                            </h2>
+                            <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="heading5" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>We provide detailed size charts for all our products. You can find them:</p>
+                                    <ul>
+                                        <li>On each product page</li>
+                                        <li>In our size guide section</li>
+                                        <li>By contacting customer service</li>
+                                    </ul>
+                                    <p class="mb-0">If you're unsure about sizing, we recommend ordering your usual size and we offer free exchanges if needed.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading6">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+                                    <i class="fas fa-user me-2 text-secondary"></i>
+                                    How do I create an account?
+                                </button>
+                            </h2>
+                            <div id="collapse6" class="accordion-collapse collapse" aria-labelledby="heading6" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Creating an account is simple and free:</p>
+                                    <ul>
+                                        <li>Click "Sign Up" in the top navigation</li>
+                                        <li>Enter your email address and create a password</li>
+                                        <li>Fill in your personal information</li>
+                                        <li>Verify your email address</li>
+                                    </ul>
+                                    <p class="mb-0">Having an account allows you to track orders, save favorites, and get exclusive offers.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tracking -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading7">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
+                                    <i class="fas fa-search me-2 text-primary"></i>
+                                    How can I track my order?
+                                </button>
+                            </h2>
+                            <div id="collapse7" class="accordion-collapse collapse" aria-labelledby="heading7" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>You can track your order in several ways:</p>
+                                    <ul>
+                                        <li>Log into your account and check "My Orders"</li>
+                                        <li>Use the tracking number sent to your email</li>
+                                        <li>Contact customer service with your order number</li>
+                                    </ul>
+                                    <p class="mb-0">You'll receive email updates at each stage of your order's journey.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Discounts -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading8">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-expanded="false" aria-controls="collapse8">
+                                    <i class="fas fa-percent me-2 text-success"></i>
+                                    Do you offer discounts and promotions?
+                                </button>
+                            </h2>
+                            <div id="collapse8" class="accordion-collapse collapse" aria-labelledby="heading8" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Yes! We regularly offer various promotions:</p>
+                                    <ul>
+                                        <li>First-time customer discounts</li>
+                                        <li>Seasonal sales and clearance events</li>
+                                        <li>Loyalty program rewards</li>
+                                        <li>Newsletter subscriber exclusive offers</li>
+                                        <li>Student and military discounts</li>
+                                    </ul>
+                                    <p class="mb-0">Sign up for our newsletter to stay updated on the latest offers!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading9">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse9" aria-expanded="false" aria-controls="collapse9">
+                                    <i class="fas fa-headset me-2 text-warning"></i>
+                                    How can I contact customer service?
+                                </button>
+                            </h2>
+                            <div id="collapse9" class="accordion-collapse collapse" aria-labelledby="heading9" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>We're here to help! Contact us through:</p>
+                                    <ul>
+                                        <li><strong>Phone:</strong> +91 1800-123-4567 (Mon-Sat, 9 AM - 6 PM)</li>
+                                        <li><strong>Email:</strong> support@fashionstore.com</li>
+                                        <li><strong>Live Chat:</strong> Available on our website</li>
+                                        <li><strong>Contact Form:</strong> Fill out our online form</li>
+                                    </ul>
+                                    <p class="mb-0">We typically respond within 24 hours during business days.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading10">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse10" aria-expanded="false" aria-controls="collapse10">
+                                    <i class="fas fa-shield-alt me-2 text-success"></i>
+                                    Is my payment information secure?
+                                </button>
+                            </h2>
+                            <div id="collapse10" class="accordion-collapse collapse" aria-labelledby="heading10" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Absolutely! We take security seriously:</p>
+                                    <ul>
+                                        <li>SSL encryption on all transactions</li>
+                                        <li>PCI DSS compliant payment processing</li>
+                                        <li>We never store your full credit card information</li>
+                                        <li>Secure payment gateways</li>
+                                        <li>Regular security audits</li>
+                                    </ul>
+                                    <p class="mb-0">Your personal and payment information is protected with industry-standard security measures.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{% url 'store:contact' %}" class="btn btn-info me-2">
+                            <i class="fas fa-envelope me-2"></i>Still Have Questions?
+                        </a>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

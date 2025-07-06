@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Returns & Refunds - Fashion Store{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-undo-alt me-2"></i>
+                        Returns & Refunds
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle me-2"></i>Easy Returns</h5>
+                        <p class="mb-0">We offer hassle-free returns within 30 days of delivery!</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <i class="fas fa-calendar-alt fa-2x text-primary mb-2"></i>
+                                <h6>30 Days</h6>
+                                <small class="text-muted">Return window</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <i class="fas fa-shipping-fast fa-2x text-success mb-2"></i>
+                                <h6>Free Returns</h6>
+                                <small class="text-muted">No return shipping cost</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <i class="fas fa-credit-card fa-2x text-warning mb-2"></i>
+                                <h6>Quick Refunds</h6>
+                                <small class="text-muted">3-5 business days</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="border-bottom pb-2 mb-3">Return Policy</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-check-circle me-2 text-success"></i>What You Can Return</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Items in original condition</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Unworn and unwashed clothing</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Items with original tags attached</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Defective or damaged items</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Wrong size or color received</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-times-circle me-2 text-danger"></i>What You Cannot Return</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-times text-danger me-2"></i>Worn or washed items</li>
+                                <li><i class="fas fa-times text-danger me-2"></i>Items without original tags</li>
+                                <li><i class="fas fa-times text-danger me-2"></i>Personalized or custom items</li>
+                                <li><i class="fas fa-times text-danger me-2"></i>Sale or clearance items</li>
+                                <li><i class="fas fa-times text-danger me-2"></i>Items purchased more than 30 days ago</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 class="border-bottom pb-2 mb-3 mt-4">How to Return</h3>
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                    <strong>1</strong>
+                                </div>
+                                <h6>Initiate Return</h6>
+                                <small class="text-muted">Go to your order history and select return</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                    <strong>2</strong>
+                                </div>
+                                <h6>Print Label</h6>
+                                <small class="text-muted">Download and print return shipping label</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                    <strong>3</strong>
+                                </div>
+                                <h6>Package Item</h6>
+                                <small class="text-muted">Pack item securely with return label</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                    <strong>4</strong>
+                                </div>
+                                <h6>Drop Off</h6>
+                                <small class="text-muted">Drop at nearest courier pickup point</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="border-bottom pb-2 mb-3 mt-4">Refund Information</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-credit-card me-2 text-primary"></i>Refund Methods</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Original payment method</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Bank transfer (3-5 days)</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Store credit (instant)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-clock me-2 text-primary"></i>Refund Timeline</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Processing: 1-2 business days</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Credit/Debit: 3-5 business days</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Bank transfer: 5-7 business days</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 class="border-bottom pb-2 mb-3 mt-4">Exchange Policy</h3>
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-exchange-alt me-2"></i>Size/Color Exchanges</h5>
+                        <p class="mb-0">Need a different size or color? We offer free exchanges within 30 days. Simply contact our customer service team with your order number and preferred size/color.</p>
+                    </div>
+
+                    <h3 class="border-bottom pb-2 mb-3 mt-4">Contact Information</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-headset me-2 text-primary"></i>Customer Service</h5>
+                            <p><i class="fas fa-phone me-2"></i>+91 1800-123-4567</p>
+                            <p><i class="fas fa-envelope me-2"></i>returns@fashionstore.com</p>
+                            <p><i class="fas fa-clock me-2"></i>Mon-Sat: 9 AM - 6 PM</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-map-marker-alt me-2 text-primary"></i>Return Address</h5>
+                            <p class="mb-0">
+                                Fashion Store Returns<br>
+                                123 Fashion Street<br>
+                                Mumbai, Maharashtra 400001<br>
+                                India
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{% url 'store:contact' %}" class="btn btn-success me-2">
+                            <i class="fas fa-headset me-2"></i>Contact Support
+                        </a>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

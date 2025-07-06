@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Services - Fashion Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary">Our Services</h1>
+                <p class="lead text-muted">Discover what we offer to enhance your shopping experience</p>
+            </div>
+            
+            <div class="row g-4 mb-5">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-shipping-fast fa-2x text-white"></i>
+                            </div>
+                            <h5>Fast & Free Shipping</h5>
+                            <p class="text-muted">Free shipping on orders over $50. Fast delivery within 2-3 business days.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-undo fa-2x text-white"></i>
+                            </div>
+                            <h5>Easy Returns</h5>
+                            <p class="text-muted">30-day return policy. No questions asked returns for your peace of mind.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-shield-alt fa-2x text-white"></i>
+                            </div>
+                            <h5>Secure Shopping</h5>
+                            <p class="text-muted">SSL encrypted payments. Your data is safe and secure with us.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-headset fa-2x text-white"></i>
+                            </div>
+                            <h5>24/7 Support</h5>
+                            <p class="text-muted">Round-the-clock customer support via chat, email, and phone.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-gift fa-2x text-white"></i>
+                            </div>
+                            <h5>Loyalty Program</h5>
+                            <p class="text-muted">Earn points with every purchase. Exclusive rewards for our loyal customers.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body p-4">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-tags fa-2x text-white"></i>
+                            </div>
+                            <h5>Seasonal Sales</h5>
+                            <p class="text-muted">Regular sales and discounts. Stay updated for the best deals.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h4 class="mb-3">Size Guide</h4>
+                            <p class="text-muted">Not sure about your size? Use our comprehensive size guide to find the perfect fit.</p>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Size</th>
+                                            <th>Chest (inches)</th>
+                                            <th>Waist (inches)</th>
+                                            <th>Hips (inches)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>XS</td><td>32-34</td><td>26-28</td><td>34-36</td></tr>
+                                        <tr><td>S</td><td>34-36</td><td>28-30</td><td>36-38</td></tr>
+                                        <tr><td>M</td><td>36-38</td><td>30-32</td><td>38-40</td></tr>
+                                        <tr><td>L</td><td>38-40</td><td>32-34</td><td>40-42</td></tr>
+                                        <tr><td>XL</td><td>40-42</td><td>34-36</td><td>42-44</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h4 class="mb-3">Care Instructions</h4>
+                            <p class="text-muted">Keep your clothes looking great with our care instructions.</p>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Machine wash cold</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Tumble dry low</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Iron on low heat if needed</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Do not bleach</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Store in a cool, dry place</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fashion Store{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% load static %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'store:home' %}">
+                <i class="fas fa-tshirt me-2"></i>Fashion Store
+            </a>
+            
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto d-none d-lg-flex">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'store:home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'store:product_list' %}">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'store:about' %}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'store:service' %}">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'store:contact' %}">Contact</a>
+                    </li>
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex me-3" method="GET" action="{% url 'store:product_list' %}">
+                    <input class="form-control me-2" type="search" name="query" placeholder="Search products..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                
+                <!-- User Menu -->
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge bg-danger cart-count" id="cartCount">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'store:cart_detail' %}">View Cart</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'store:checkout' %}">Checkout</a></li>
+                        </ul>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{ user.first_name|default:user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'store:order_history' %}">My Orders</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="navbar fixed-bottom navbar-dark bg-dark d-lg-none">
+        <div class="container-fluid">
+            <div class="row w-100">
+                <div class="col text-center">
+                    <a href="{% url 'store:home' %}" class="nav-link text-light">
+                        <i class="fas fa-home"></i>
+                        <small class="d-block">Home</small>
+                    </a>
+                </div>
+                <div class="col text-center">
+                    <a href="{% url 'store:about' %}" class="nav-link text-light">
+                        <i class="fas fa-info-circle"></i>
+                        <small class="d-block">About</small>
+                    </a>
+                </div>
+                <div class="col text-center">
+                    <a href="{% url 'store:service' %}" class="nav-link text-light">
+                        <i class="fas fa-cogs"></i>
+                        <small class="d-block">Service</small>
+                    </a>
+                </div>
+                <div class="col text-center">
+                    <a href="{% url 'store:contact' %}" class="nav-link text-light">
+                        <i class="fas fa-phone"></i>
+                        <small class="d-block">Contact</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5 d-none d-lg-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5><i class="fas fa-tshirt me-2"></i>Fashion Store</h5>
+                    <p class="text-muted">Your one-stop destination for trendy fashion and accessories.</p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="text-muted"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'store:home' %}" class="text-muted text-decoration-none"><i class="fas fa-home me-2"></i>Home</a></li>
+                        <li><a href="{% url 'store:product_list' %}" class="text-muted text-decoration-none"><i class="fas fa-tshirt me-2"></i>Products</a></li>
+                        <li><a href="{% url 'store:about' %}" class="text-muted text-decoration-none"><i class="fas fa-info-circle me-2"></i>About</a></li>
+                        <li><a href="{% url 'store:service' %}" class="text-muted text-decoration-none"><i class="fas fa-cogs me-2"></i>Services</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Customer Service</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'store:contact' %}" class="text-muted text-decoration-none"><i class="fas fa-phone me-2"></i>Contact Us</a></li>
+                        <li><a href="{% url 'store:shipping_info' %}" class="text-muted text-decoration-none"><i class="fas fa-shipping-fast me-2"></i>Shipping Info</a></li>
+                        <li><a href="{% url 'store:returns' %}" class="text-muted text-decoration-none"><i class="fas fa-undo me-2"></i>Returns</a></li>
+                        <li><a href="{% url 'store:faq' %}" class="text-muted text-decoration-none"><i class="fas fa-question-circle me-2"></i>FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Info</h5>
+                    <p class="text-muted">
+                        <i class="fas fa-envelope me-2"></i>info@fashionstore.com<br>
+                        <i class="fas fa-phone me-2"></i>+1 (555) 123-4567<br>
+                        <i class="fas fa-map-marker-alt me-2"></i>123 Fashion Street, Style City
+                    </p>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <p class="text-muted mb-0">&copy; 2024 Fashion Store. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

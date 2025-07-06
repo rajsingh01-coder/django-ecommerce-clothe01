@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shipping Information - Fashion Store{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-shipping-fast me-2"></i>
+                        Shipping Information
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="text-center p-3 border rounded">
+                                <i class="fas fa-truck fa-3x text-primary mb-3"></i>
+                                <h4>Standard Shipping</h4>
+                                <p class="text-muted">3-5 Business Days</p>
+                                <h5 class="text-success">₹99</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center p-3 border rounded">
+                                <i class="fas fa-rocket fa-3x text-warning mb-3"></i>
+                                <h4>Express Shipping</h4>
+                                <p class="text-muted">1-2 Business Days</p>
+                                <h5 class="text-success">₹199</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle me-2"></i>Free Shipping</h5>
+                        <p class="mb-0">Free standard shipping on orders above ₹999!</p>
+                    </div>
+
+                    <h3 class="border-bottom pb-2 mb-3">Shipping Details</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-clock me-2 text-primary"></i>Processing Time</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Orders placed before 2 PM are processed same day</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Orders placed after 2 PM are processed next business day</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Weekend orders are processed on Monday</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-map-marker-alt me-2 text-primary"></i>Delivery Areas</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>All major cities in India</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Tier 1 & Tier 2 cities</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Remote areas may take 1-2 extra days</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 class="border-bottom pb-2 mb-3 mt-4">Tracking Your Order</h3>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <i class="fas fa-box fa-2x text-primary mb-2"></i>
+                                <h6>Order Confirmed</h6>
+                                <small class="text-muted">Order received and confirmed</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <i class="fas fa-cog fa-2x text-warning mb-2"></i>
+                                <h6>Processing</h6>
+                                <small class="text-muted">Order being prepared for shipment</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="p-3 border rounded">
+                                <i class="fas fa-truck fa-2x text-success mb-2"></i>
+                                <h6>In Transit</h6>
+                                <small class="text-muted">Package on its way to you</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="border-bottom pb-2 mb-3 mt-4">Important Notes</h3>
+                    <div class="alert alert-warning">
+                        <ul class="mb-0">
+                            <li>Delivery times may vary during peak seasons and holidays</li>
+                            <li>We do not deliver to P.O. Boxes</li>
+                            <li>Someone must be available to receive the package</li>
+                            <li>Valid ID proof may be required for delivery</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{% url 'store:product_list' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                        </a>
+                        <a href="{% url 'store:contact' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-2"></i>Contact Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - Fashion Store{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Shopping Cart</h1>
+    
+    {% if cart.items.all %}
+    <div class="row">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Cart Items ({{ cart.get_total_items }})</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in cart.items.all %}
+                    <div class="row align-items-center mb-3 pb-3 border-bottom">
+                        <div class="col-md-2">
+                            {% if item.product.image_url %}
+                            <img src="{{ item.product.image_url }}" class="img-fluid rounded" alt="{{ item.product.name }}" style="height: 80px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 80px;">
+                                <i class="fas fa-tshirt fa-2x text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="mb-1">{{ item.product.name }}</h6>
+                            <p class="text-muted mb-1">{{ item.product.category.name }}</p>
+                            {% if item.size or item.color %}
+                            <small class="text-muted">
+                                {% if item.size %}Size: {{ item.size }}{% endif %}
+                                {% if item.size and item.color %} | {% endif %}
+                                {% if item.color %}Color: {{ item.color }}{% endif %}
+                            </small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-2">
+                            <span class="h6">₹{{ item.product.get_current_price }}</span>
+                        </div>
+                        <div class="col-md-2">
+                            <form method="POST" class="d-flex align-items-center">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <input type="hidden" name="action" value="update">
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99" class="form-control form-control-sm" style="width: 60px;">
+                                <button type="submit" class="btn btn-sm btn-outline-primary ms-2">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-1">
+                            <span class="h6">₹{{ item.get_total_price }}</span>
+                        </div>
+                        <div class="col-md-1">
+                            <form method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <input type="hidden" name="action" value="remove">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this item from cart?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cart Summary -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>₹{{ cart.get_total_price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span>Free</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="h5">₹{{ cart.get_total_price }}</strong>
+                    </div>
+                    
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'store:checkout' %}" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
+                    </a>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Please <a href="{% url 'accounts:login' %}?next={{ request.path }}">login</a> to checkout.
+                    </div>
+                    {% endif %}
+                    
+                    <a href="{% url 'store:product_list' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Promo Code -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Promo Code</h6>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Enter promo code">
+                            <button class="btn btn-outline-primary" type="submit">Apply</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- Empty Cart -->
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+        <h3>Your cart is empty</h3>
+        <p class="text-muted mb-4">Looks like you haven't added any items to your cart yet.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 
