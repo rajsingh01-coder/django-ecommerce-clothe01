@@ -133,6 +133,13 @@
                     </a>
                 </div>
                 <div class="col text-center">
+                    <a href="{% url 'store:cart_detail' %}" class="nav-link text-light position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge bg-danger cart-count position-absolute top-0 start-50 translate-middle-x" id="cartCountMobile" style="font-size: 0.7rem;">0</span>
+                        <small class="d-block">Cart</small>
+                    </a>
+                </div>
+                <div class="col text-center">
                     <a href="{% url 'store:contact' %}" class="nav-link text-light">
                         <i class="fas fa-phone"></i>
                         <small class="d-block">Contact</small>
@@ -143,7 +150,7 @@
     </nav>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5 d-none d-lg-block">
+    <footer class="bg-dark text-light py-4 mt-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-3">

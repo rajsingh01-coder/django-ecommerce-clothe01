@@ -1,9 +1,35 @@
+# Core Django
 Django==4.1.13
-Pillow==10.0.0
-django-crispy-forms==2.0
-crispy-bootstrap5==0.7
+
+# Database (choose one based on your deployment)
+# For SQLite (development)
+# No additional package needed
+
+# For PostgreSQL (production)
+psycopg2-binary==2.9.7
+
+# For MySQL (production)
+# mysqlclient==2.1.1
+
+# Static files and deployment
 whitenoise==6.5.0
 gunicorn==21.2.0
-psycopg2-binary==2.9.7
-djongo==1.3.6
-pymongo==3.12.3 
+
+# Forms and UI
+django-crispy-forms==2.0
+crispy-bootstrap5==0.7
+
+# Payment Integration
+razorpay==1.4.1
+
+# Data Export/Import for MongoDB Compass
+django-import-export==3.2.0
+
+# Image processing (optional)
+# Pillow==10.0.0
+
+# Email (optional - for production)
+# django-anymail[sendgrid]==10.1
+
+# Development only (remove for production)
+# django-debug-toolbar==4.2.0 

@@ -3,13 +3,36 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
 import uuid
+from django.utils import timezone
+
+
+class ClientAdmin(models.Model):
+    """Client admin access for managing their own data"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    company_name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    can_manage_products = models.BooleanField(default=True)
+    can_manage_orders = models.BooleanField(default=True)
+    can_manage_customers = models.BooleanField(default=True)
+    can_view_reports = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.company_name} - {self.user.username}"
+
+    class Meta:
+        verbose_name = "Client Admin"
+        verbose_name_plural = "Client Admins"
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, blank=True)
-    description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='categories/', blank=True, null=True)
+    name = models.CharField(max_length=100, default='')
+    slug = models.SlugField(unique=True, blank=True, default='')
+    description = models.TextField(blank=True, default='')
+    image = models.ImageField(upload_to='categories/', blank=True, null=True)  # For local file uploads only
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -40,17 +63,18 @@ class Product(models.Model):
     ]
 
     name = models.CharField(max_length=200)
+    brand = models.CharField(max_length=100, blank=True)  # New field for brand
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     sale_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
-    available_sizes = models.JSONField(default=list)
-    available_colors = models.JSONField(default=list)
+    available_sizes = models.JSONField(default=list, blank=True)
+    available_colors = models.JSONField(default=list, blank=True)
     stock = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    image_url = models.URLField(blank=True, null=True)
+    image = models.ImageField(upload_to='products/', blank=True, null=True)  # Local file upload
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -78,7 +102,7 @@ class Product(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='products/')
-    alt_text = models.CharField(max_length=200, blank=True)
+    alt_text = models.CharField(max_length=200, blank=True, default='')
     is_primary = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -91,7 +115,7 @@ class ProductImage(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    session_key = models.CharField(max_length=40, null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -109,8 +133,8 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    size = models.CharField(max_length=10, blank=True)
-    color = models.CharField(max_length=50, blank=True)
+    size = models.CharField(max_length=10, blank=True, default='')
+    color = models.CharField(max_length=50, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -129,19 +153,42 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('refunded', 'Refunded'),
+    ]
+
+    PAYMENT_METHOD_CHOICES = [
+        ('cod', 'Cash on Delivery'),
+        ('razorpay', 'Razorpay'),
+        ('stripe', 'Stripe'),
+        ('paypal', 'PayPal'),
+        ('upi', 'UPI'),
+        ('other', 'Other'),
+    ]
+
     order_number = models.CharField(max_length=20, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
-    address = models.TextField()
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    zip_code = models.CharField(max_length=20)
-    country = models.CharField(max_length=100)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, blank=True, default='cod')
+    razorpay_order_id = models.CharField(max_length=100, blank=True, default='')
+    razorpay_payment_id = models.CharField(max_length=100, blank=True, default='')
+    razorpay_signature = models.CharField(max_length=200, blank=True, default='')
+    shipping_address = models.TextField(default='')
+    phone_number = models.CharField(max_length=15, default='')
+    first_name = models.CharField(max_length=50, blank=True, default='')
+    last_name = models.CharField(max_length=50, blank=True, default='')
+    email = models.EmailField(blank=True, default='')
+    phone = models.CharField(max_length=15, blank=True, default='')
+    address = models.TextField(blank=True, default='')
+    city = models.CharField(max_length=100, blank=True, default='')
+    state = models.CharField(max_length=100, blank=True, default='')
+    zip_code = models.CharField(max_length=20, blank=True, default='')
+    country = models.CharField(max_length=100, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -165,8 +212,8 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    size = models.CharField(max_length=10, blank=True)
-    color = models.CharField(max_length=50, blank=True)
+    size = models.CharField(max_length=10, blank=True, default='')
+    color = models.CharField(max_length=50, blank=True, default='')
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name} in {self.order}"
@@ -178,10 +225,10 @@ class OrderItem(models.Model):
 
 
 class Contact(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
-    subject = models.CharField(max_length=200)
-    message = models.TextField()
+    name = models.CharField(max_length=100, default='')
+    email = models.EmailField(default='')
+    subject = models.CharField(max_length=200, default='')
+    message = models.TextField(default='')
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 

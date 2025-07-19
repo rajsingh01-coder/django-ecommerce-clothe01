@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'import_export',  # For data export/import
     'store',
     'accounts',
 ]
@@ -73,28 +74,18 @@ WSGI_APPLICATION = 'ecommerce_clothes.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Using SQLite for easy setup - change to MongoDB later
+# SQLite Configuration (Fallback for development)
+# Uncomment below and comment above if MongoDB is not available
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'clothes_db',
+        'USER': 'alpha',
+        'PASSWORD': 'alpha23036',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
-
-# MongoDB Configuration (uncomment when MongoDB is available)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'djongo',
-#         'NAME': os.environ.get('DB_NAME', 'ecommerce_clothes'),
-#         'ENFORCE_SCHEMA': True,
-#         'CLIENT': {
-#             'host': os.environ.get('DB_HOST', 'localhost'),
-#             'port': int(os.environ.get('DB_PORT', 27017)),
-#             'username': os.environ.get('DB_USERNAME', ''),
-#             'password': os.environ.get('DB_PASSWORD', ''),
-#         }
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -192,4 +183,12 @@ ADMIN_EMAIL = 'singhraj23036@gmail.com'  # Admin email for order notifications
 # 
 # Example: EMAIL_HOST_PASSWORD = 'abcd efgh ijkl mnop'
 # 
-# Without this, contact form and order emails will fail! 
+# Without this, contact form and order emails will fail!
+
+# Razorpay Payment Gateway Configuration
+RAZORPAY_KEY_ID = 'rzp_test_YOUR_KEY_ID'  # Replace with your test key
+RAZORPAY_KEY_SECRET = 'YOUR_KEY_SECRET'    # Replace with your test secret
+
+# For production, use live keys:
+# RAZORPAY_KEY_ID = 'rzp_live_YOUR_LIVE_KEY_ID'
+# RAZORPAY_KEY_SECRET = 'YOUR_LIVE_KEY_SECRET' 

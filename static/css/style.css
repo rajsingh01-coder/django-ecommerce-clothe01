@@ -4,6 +4,7 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 /* Hero Section */
@@ -23,6 +24,46 @@ body {
 .hero-section p {
     font-size: 1.25rem;
     margin-bottom: 2rem;
+}
+
+/* Hero Section Responsive Styles */
+.hero-section.custom-hero {
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+@media (max-width: 767px) {
+    .hero-section.custom-hero {
+        min-height: 60vh;
+        width: 100vw;
+        background-size: cover;
+        background-position: center;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section.custom-hero {
+        min-height: 90vh;
+        width: 100vw;
+        background-size: cover;
+        background-position: center;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        margin-top: -26px;
+        
+    }
+}
+@media (min-width: 992px) {
+    .hero-section.custom-hero {
+        margin-top: -26px !important;
+    }
 }
 
 /* Product Cards */
@@ -195,7 +236,7 @@ body {
 /* Footer */
 footer {
     background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    margin-top: auto;
+    margin-top: -10px !important;
 }
 
 footer a {

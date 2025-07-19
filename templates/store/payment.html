@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>
+                        Secure Payment
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Order Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Order Summary</h5>
+                            <p><strong>Order ID:</strong> {{ order.order_number }}</p>
+                            <p><strong>Amount:</strong> ₹{{ order.total_amount }}</p>
+                            <p><strong>Items:</strong> {{ order.items.count }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Shipping Details</h5>
+                            <p><strong>Name:</strong> {{ user_name }}</p>
+                            <p><strong>Phone:</strong> {{ user_phone }}</p>
+                            <p><strong>Address:</strong> {{ order.shipping_address|truncatechars:50 }}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Payment Options -->
+                    <div class="text-center mb-4">
+                        <h5>Choose Payment Method</h5>
+                        <div class="row mt-3">
+                            <div class="col-md-3 col-6 mb-2">
+                                <div class="payment-option active" data-method="card">
+                                    <i class="fas fa-credit-card fa-2x text-primary"></i>
+                                    <p class="mt-2">Credit/Debit Card</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-2">
+                                <div class="payment-option" data-method="upi">
+                                    <i class="fas fa-mobile-alt fa-2x text-success"></i>
+                                    <p class="mt-2">UPI</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-2">
+                                <div class="payment-option" data-method="netbanking">
+                                    <i class="fas fa-university fa-2x text-info"></i>
+                                    <p class="mt-2">Net Banking</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-2">
+                                <div class="payment-option" data-method="wallet">
+                                    <i class="fas fa-wallet fa-2x text-warning"></i>
+                                    <p class="mt-2">Wallets</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Razorpay Payment Button -->
+                    <div class="text-center">
+                        <button id="rzp-button" class="btn btn-primary btn-lg">
+                            <i class="fas fa-lock me-2"></i>
+                            Pay Securely ₹{{ order.total_amount }}
+                        </button>
+                        <p class="text-muted mt-2">
+                            <small>
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Your payment is secured by Razorpay
+                            </small>
+                        </p>
+                    </div>
+
+                    <!-- Payment Security Info -->
+                    <div class="row mt-4">
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-lock text-success fa-2x mb-2"></i>
+                            <h6>Secure Payment</h6>
+                            <small class="text-muted">256-bit SSL encryption</small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-shield-alt text-primary fa-2x mb-2"></i>
+                            <h6>PCI Compliant</h6>
+                            <small class="text-muted">Bank-grade security</small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-undo text-info fa-2x mb-2"></i>
+                            <h6>Instant Refund</h6>
+                            <small class="text-muted">7-day money back guarantee</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Payment option selection
+    const paymentOptions = document.querySelectorAll('.payment-option');
+    paymentOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            paymentOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Razorpay configuration
+    const options = {
+        key: '{{ razorpay_key_id }}',
+        amount: {{ amount }},
+        currency: '{{ currency }}',
+        name: 'Fashion Store',
+        description: 'Order {{ order.order_number }}',
+        image: '{% static "images/logo.png" %}',
+        order_id: '{{ razorpay_order_id }}',
+        handler: function (response) {
+            // Handle successful payment
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{% url "store:payment_callback" %}';
+            
+            const fields = {
+                'razorpay_payment_id': response.razorpay_payment_id,
+                'razorpay_order_id': response.razorpay_order_id,
+                'razorpay_signature': response.razorpay_signature,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            };
+            
+            for (const [key, value] of Object.entries(fields)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        },
+        prefill: {
+            name: '{{ user_name }}',
+            email: '{{ user_email }}',
+            contact: '{{ user_phone }}'
+        },
+        notes: {
+            address: '{{ order.shipping_address }}',
+            order_id: '{{ order.order_number }}'
+        },
+        theme: {
+            color: '#007bff'
+        },
+        modal: {
+            ondismiss: function() {
+                // Handle modal dismissal
+                console.log('Payment modal closed');
+            }
+        }
+    };
+
+    // Initialize Razorpay
+    const rzp = new Razorpay(options);
+    
+    document.getElementById('rzp-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        rzp.open();
+    });
+});
+</script>
+
+<style>
+.payment-option {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-option:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+
+.payment-option.active {
+    border-color: #007bff;
+    background-color: #e3f2fd;
+}
+
+.payment-option p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+</style>
+{% endblock %} 

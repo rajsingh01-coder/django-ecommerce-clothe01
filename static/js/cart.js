@@ -81,11 +81,16 @@ $(document).ready(function() {
     // Update cart count
     function updateCartCount(count) {
         $('#cartCount').text(count);
-        
+
+        // Also update the mobile bottom nav
+        $('#cartCountMobile').text(count);
+
         // Add animation
         $('#cartCount').addClass('pulse');
+        $('#cartCountMobile').addClass('pulse');
         setTimeout(function() {
             $('#cartCount').removeClass('pulse');
+            $('#cartCountMobile').removeClass('pulse');
         }, 1000);
     }
 

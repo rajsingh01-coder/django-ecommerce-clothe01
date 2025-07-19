@@ -1,18 +1,24 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator
-from django.db.models import Q
-from django.views.decorators.http import require_POST
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from .models import Product, Category, Cart, CartItem, Order, OrderItem
-from .forms import CheckoutForm, CartItemForm, SearchForm, ContactForm
-from django.conf import settings
+from django.db.models import Q, Sum, Count
 from django.utils import timezone
+from django.views.decorators.http import require_POST
+from datetime import timedelta
+from .models import *
+from .forms import *
+import json
+import csv
+from django.views.decorators.csrf import csrf_exempt
 
+# Initialize Razorpay client conditionally
+try:
+    import razorpay
+    razorpay_client = None
+except ImportError:
+    razorpay_client = None
 
 def home(request):
     """Homepage with featured products and categories"""
@@ -91,7 +97,7 @@ def category_detail(request, slug):
     products = Product.objects.filter(category=category, is_active=True)
     
     # Pagination
-    paginator = Paginator(products, 12)
+    paginator = Paginator(products, 8)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -228,6 +234,24 @@ def checkout(request):
                     color=cart_item.color
                 )
             
+            # Create Razorpay order (only if razorpay is available)
+            if razorpay_client:
+                try:
+                    razorpay_order = razorpay_client.order.create({
+                        'amount': int(order.total_amount * 100),  # Convert to paise
+                        'currency': 'INR',
+                        'receipt': order.order_number,
+                        'notes': {
+                            'order_id': order.order_number,
+                            'user_id': str(request.user.id)
+                        }
+                    })
+                    
+                    order.razorpay_order_id = razorpay_order['id']
+                    order.save()
+                except Exception as e:
+                    messages.warning(request, f'Payment gateway not configured: {str(e)}')
+            
             # Send order confirmation email
             try:
                 # Render email template
@@ -241,7 +265,7 @@ def checkout(request):
                     subject=f'Order Confirmation - {order.order_number}',
                     message=plain_message,
                     from_email=None,  # Uses DEFAULT_FROM_EMAIL
-                    recipient_list=[order.email],
+                    recipient_list=[order.user.email],
                     html_message=html_message,
                     fail_silently=False,
                 )
@@ -253,14 +277,13 @@ def checkout(request):
                 
                 Order Details:
                 Order Number: {order.order_number}
-                Customer: {order.first_name} {order.last_name}
-                Email: {order.email}
-                Phone: {order.phone}
+                Customer: {order.user.get_full_name() or order.user.username}
+                Email: {order.user.email}
+                Phone: {order.phone_number}
                 Total Amount: ₹{order.total_amount}
                 
                 Shipping Address:
-                {order.address}
-                {order.city}, {order.state} {order.pincode}
+                {order.shipping_address}
                 
                 Order Items:
                 """
@@ -295,15 +318,7 @@ def checkout(request):
             messages.success(request, f'Order placed successfully! Order number: {order.order_number}')
             return redirect('store:order_detail', order_number=order.order_number)
     else:
-        # Pre-fill form with user data if available
-        initial_data = {}
-        if request.user.is_authenticated:
-            initial_data = {
-                'first_name': request.user.first_name,
-                'last_name': request.user.last_name,
-                'email': request.user.email,
-            }
-        form = CheckoutForm(initial=initial_data)
+        form = CheckoutForm()
     
     context = {
         'form': form,
@@ -424,4 +439,400 @@ def returns(request):
     return render(request, 'store/returns.html')
 
 def faq(request):
-    return render(request, 'store/faq.html') 
+    return render(request, 'store/faq.html')
+
+@csrf_exempt
+def payment_callback(request):
+    if request.method == 'POST':
+        try:
+            # Get payment data
+            payment_id = request.POST.get('razorpay_payment_id')
+            order_id = request.POST.get('razorpay_order_id')
+            signature = request.POST.get('razorpay_signature')
+            
+            # Verify signature
+            params_dict = {
+                'razorpay_payment_id': payment_id,
+                'razorpay_order_id': order_id,
+                'razorpay_signature': signature
+            }
+            
+            razorpay_client.utility.verify_payment_signature(params_dict)
+            
+            # Update order
+            order = Order.objects.get(razorpay_order_id=order_id)
+            order.payment_status = 'completed'
+            order.payment_method = 'Razorpay'
+            order.razorpay_payment_id = payment_id
+            order.razorpay_signature = signature
+            order.save()
+            
+            messages.success(request, 'Payment successful! Your order has been placed.')
+            return redirect('store:order_detail', order_number=order.order_number)
+            
+        except Exception as e:
+            messages.error(request, f'Payment verification failed: {str(e)}')
+            return redirect('store:order_history')
+    
+    return redirect('store:order_history') 
+
+# Client Admin Views
+def is_client_admin(user):
+    """Check if user is a client admin"""
+    return hasattr(user, 'clientadmin') and user.clientadmin.is_active
+
+@login_required
+@user_passes_test(is_client_admin)
+def client_dashboard(request):
+    """Client admin dashboard"""
+    client_admin = request.user.clientadmin
+    
+    # Get statistics based on permissions
+    context = {
+        'client_admin': client_admin,
+        'total_products': 0,
+        'total_orders': 0,
+        'total_customers': 0,
+        'total_revenue': 0,
+        'recent_orders': [],
+        'monthly_revenue': 0,
+    }
+    
+    if client_admin.can_manage_products:
+        context['total_products'] = Product.objects.count()
+    
+    if client_admin.can_manage_orders:
+        context['total_orders'] = Order.objects.count()
+        context['total_revenue'] = Order.objects.filter(
+            payment_status='completed'
+        ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        
+        # Monthly revenue
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        context['monthly_revenue'] = Order.objects.filter(
+            created_at__gte=thirty_days_ago,
+            payment_status='completed'
+        ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        
+        # Recent orders
+        context['recent_orders'] = Order.objects.order_by('-created_at')[:10]
+    
+    if client_admin.can_manage_customers:
+        context['total_customers'] = User.objects.filter(is_staff=False).count()
+    
+    return render(request, 'store/client_dashboard.html', context)
+
+@login_required
+@user_passes_test(is_client_admin)
+def client_products(request):
+    """Client admin products management"""
+    if not request.user.clientadmin.can_manage_products:
+        messages.error(request, "You don't have permission to manage products.")
+        return redirect('store:client_dashboard')
+    
+    products = Product.objects.all()
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(category__name__icontains=search_query)
+        )
+    
+    # Filtering
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        products = products.filter(category_id=category_filter)
+    
+    # Pagination
+    paginator = Paginator(products, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    categories = Category.objects.all()
+    
+    context = {
+        'products': page_obj,
+        'categories': categories,
+        'search_query': search_query,
+        'category_filter': category_filter,
+    }
+    
+    return render(request, 'store/client_products.html', context)
+
+@login_required
+@user_passes_test(is_client_admin)
+def client_orders(request):
+    """Client admin orders management"""
+    if not request.user.clientadmin.can_manage_orders:
+        messages.error(request, "You don't have permission to manage orders.")
+        return redirect('store:client_dashboard')
+    
+    orders = Order.objects.all()
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        orders = orders.filter(
+            Q(order_number__icontains=search_query) |
+            Q(user__username__icontains=search_query) |
+            Q(user__email__icontains=search_query)
+        )
+    
+    # Filtering
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        orders = orders.filter(status=status_filter)
+    
+    payment_status_filter = request.GET.get('payment_status', '')
+    if payment_status_filter:
+        orders = orders.filter(payment_status=payment_status_filter)
+    
+    # Pagination
+    paginator = Paginator(orders, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'orders': page_obj,
+        'search_query': search_query,
+        'status_filter': status_filter,
+        'payment_status_filter': payment_status_filter,
+        'status_choices': Order.STATUS_CHOICES,
+        'payment_status_choices': Order.PAYMENT_STATUS_CHOICES,
+    }
+    
+    return render(request, 'store/client_orders.html', context)
+
+@login_required
+@user_passes_test(is_client_admin)
+def client_customers(request):
+    """Client admin customers management"""
+    if not request.user.clientadmin.can_manage_customers:
+        messages.error(request, "You don't have permission to manage customers.")
+        return redirect('store:client_dashboard')
+    
+    customers = User.objects.filter(is_staff=False, is_superuser=False)
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        customers = customers.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    
+    # Get customer statistics
+    for customer in customers:
+        customer.total_orders = Order.objects.filter(user=customer).count()
+        customer.total_spent = Order.objects.filter(
+            user=customer, 
+            payment_status='completed'
+        ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    
+    # Pagination
+    paginator = Paginator(customers, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'customers': page_obj,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'store/client_customers.html', context)
+
+@login_required
+@user_passes_test(is_client_admin)
+def client_reports(request):
+    """Client admin reports"""
+    if not request.user.clientadmin.can_view_reports:
+        messages.error(request, "You don't have permission to view reports.")
+        return redirect('store:client_dashboard')
+    
+    # Sales report
+    today = timezone.now().date()
+    thirty_days_ago = today - timedelta(days=30)
+    
+    # Daily sales for last 30 days
+    daily_sales = []
+    for i in range(30):
+        date = thirty_days_ago + timedelta(days=i)
+        sales = Order.objects.filter(
+            created_at__date=date,
+            payment_status='completed'
+        ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        daily_sales.append({
+            'date': date,
+            'sales': sales
+        })
+    
+    # Top products
+    top_products = Product.objects.annotate(
+        total_sold=Count('orderitem')
+    ).order_by('-total_sold')[:10]
+    
+    # Top categories
+    top_categories = Category.objects.annotate(
+        total_products=Count('products'),
+        total_sales=Sum('products__orderitem__price')
+    ).order_by('-total_sales')[:10]
+    
+    context = {
+        'daily_sales': daily_sales,
+        'top_products': top_products,
+        'top_categories': top_categories,
+        'total_revenue': Order.objects.filter(
+            payment_status='completed'
+        ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0,
+        'total_orders': Order.objects.count(),
+        'total_customers': User.objects.filter(is_staff=False).count(),
+    }
+    
+    return render(request, 'store/client_reports.html', context)
+
+@login_required
+@user_passes_test(is_client_admin)
+def client_export_data(request):
+    """Export data for client admin"""
+    export_type = request.GET.get('type', 'json')
+    model_name = request.GET.get('model', '')
+    
+    if not model_name:
+        messages.error(request, "Please specify a model to export.")
+        return redirect('store:client_dashboard')
+    
+    # Check permissions
+    client_admin = request.user.clientadmin
+    if model_name == 'products' and not client_admin.can_manage_products:
+        messages.error(request, "You don't have permission to export products.")
+        return redirect('store:client_dashboard')
+    elif model_name == 'orders' and not client_admin.can_manage_orders:
+        messages.error(request, "You don't have permission to export orders.")
+        return redirect('store:client_dashboard')
+    elif model_name == 'customers' and not client_admin.can_manage_customers:
+        messages.error(request, "You don't have permission to export customers.")
+        return redirect('store:client_dashboard')
+    
+    # Export data
+    if export_type == 'json':
+        return export_data_json(request, model_name)
+    elif export_type == 'csv':
+        return export_data_csv(request, model_name)
+    else:
+        messages.error(request, "Invalid export type.")
+        return redirect('store:client_dashboard')
+
+def export_data_json(request, model_name):
+    """Export data to JSON format"""
+    models_map = {
+        'products': Product,
+        'orders': Order,
+        'customers': User,
+    }
+    
+    if model_name in models_map:
+        model = models_map[model_name]
+        queryset = model.objects.all()
+        
+        # Filter customers to exclude staff
+        if model == User:
+            queryset = queryset.filter(is_staff=False, is_superuser=False)
+        
+        response = HttpResponse(content_type='application/json')
+        response['Content-Disposition'] = f'attachment; filename="{model_name}_{timezone.now().strftime("%Y%m%d_%H%M%S")}.json"'
+        
+        data = []
+        for obj in queryset:
+            data.append(serialize_object(obj))
+        
+        json.dump(data, response, indent=2)
+        return response
+    
+    messages.error(request, 'Invalid model selected')
+    return redirect('store:client_dashboard')
+
+def export_data_csv(request, model_name):
+    """Export data to CSV format"""
+    models_map = {
+        'products': Product,
+        'orders': Order,
+        'customers': User,
+    }
+    
+    if model_name in models_map:
+        model = models_map[model_name]
+        queryset = model.objects.all()
+        
+        # Filter customers to exclude staff
+        if model == User:
+            queryset = queryset.filter(is_staff=False, is_superuser=False)
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{model_name}_{timezone.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+        
+        writer = csv.writer(response)
+        
+        if model == Product:
+            writer.writerow(['Name', 'Category', 'Price', 'Sale Price', 'Stock', 'Is Featured', 'Is Active'])
+            for obj in queryset:
+                writer.writerow([
+                    obj.name,
+                    obj.category.name if obj.category else '',
+                    obj.price,
+                    obj.sale_price or '',
+                    obj.stock,
+                    obj.is_featured,
+                    obj.is_active
+                ])
+        elif model == Order:
+            writer.writerow(['Order Number', 'User', 'Total Amount', 'Status', 'Payment Status', 'Created At'])
+            for obj in queryset:
+                writer.writerow([
+                    obj.order_number,
+                    obj.user.username,
+                    obj.total_amount,
+                    obj.status,
+                    obj.payment_status,
+                    obj.created_at
+                ])
+        elif model == User:
+            writer.writerow(['Username', 'Email', 'First Name', 'Last Name', 'Date Joined'])
+            for obj in queryset:
+                writer.writerow([
+                    obj.username,
+                    obj.email,
+                    obj.first_name,
+                    obj.last_name,
+                    obj.date_joined
+                ])
+        
+        return response
+    
+    messages.error(request, 'Invalid model selected')
+    return redirect('store:client_dashboard')
+
+def serialize_object(obj):
+    """Serialize Django model object to dictionary"""
+    data = {}
+    for field in obj._meta.fields:
+        value = getattr(obj, field.name)
+        if hasattr(value, 'isoformat'):  # DateTime fields
+            data[field.name] = value.isoformat()
+        elif hasattr(value, 'username'):  # User fields
+            data[field.name] = value.username
+        elif hasattr(value, 'name'):  # ForeignKey fields
+            data[field.name] = value.name
+        else:
+            data[field.name] = str(value)
+    return data 
+
+# Utility function to delete all products and categories (for admin use only)
+def delete_all_products_and_categories():
+    from store.models import Product, Category
+    Product.objects.all().delete()
+    Category.objects.all().delete() 

@@ -1,0 +1,281 @@
+{% extends 'store/client_base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Statistics Cards -->
+    {% if user.clientadmin.can_manage_products %}
+    <div class="col-md-3 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">{{ total_products }}</h3>
+                        <p class="mb-0 text-white-50">Total Products</p>
+                    </div>
+                    <div class="text-end">
+                        <i class="fas fa-box fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user.clientadmin.can_manage_orders %}
+    <div class="col-md-3 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">{{ total_orders }}</h3>
+                        <p class="mb-0 text-white-50">Total Orders</p>
+                    </div>
+                    <div class="text-end">
+                        <i class="fas fa-shopping-cart fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user.clientadmin.can_manage_customers %}
+    <div class="col-md-3 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">{{ total_customers }}</h3>
+                        <p class="mb-0 text-white-50">Total Customers</p>
+                    </div>
+                    <div class="text-end">
+                        <i class="fas fa-users fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user.clientadmin.can_manage_orders %}
+    <div class="col-md-3 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">₹{{ total_revenue|floatformat:0 }}</h3>
+                        <p class="mb-0 text-white-50">Total Revenue</p>
+                    </div>
+                    <div class="text-end">
+                        <i class="fas fa-rupee-sign fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row">
+    <!-- Recent Orders -->
+    {% if user.clientadmin.can_manage_orders and recent_orders %}
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock"></i> Recent Orders
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'store:order_detail' order.order_number %}" class="text-decoration-none">
+                                        {{ order.order_number }}
+                                    </a>
+                                </td>
+                                <td>{{ order.user.get_full_name|default:order.user.username }}</td>
+                                <td>₹{{ order.total_amount }}</td>
+                                <td>
+                                    <span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'shipped' %}info{% elif order.status == 'processing' %}warning{% else %}secondary{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'store:client_orders' %}" class="btn btn-primary">
+                        View All Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if user.clientadmin.can_manage_products %}
+                    <a href="{% url 'store:client_products' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-box"></i> Manage Products
+                    </a>
+                    {% endif %}
+
+                    {% if user.clientadmin.can_manage_orders %}
+                    <a href="{% url 'store:client_orders' %}" class="btn btn-outline-success">
+                        <i class="fas fa-shopping-cart"></i> View Orders
+                    </a>
+                    {% endif %}
+
+                    {% if user.clientadmin.can_manage_customers %}
+                    <a href="{% url 'store:client_customers' %}" class="btn btn-outline-info">
+                        <i class="fas fa-users"></i> Manage Customers
+                    </a>
+                    {% endif %}
+
+                    {% if user.clientadmin.can_view_reports %}
+                    <a href="{% url 'store:client_reports' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-chart-bar"></i> View Reports
+                    </a>
+                    {% endif %}
+
+                    <a href="{% url 'store:home' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-store"></i> Visit Store
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Data -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-download"></i> Export Data
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if user.clientadmin.can_manage_products %}
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'store:client_export_data' %}?model=products&type=json" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-file-code"></i> Products (JSON)
+                        </a>
+                        <a href="{% url 'store:client_export_data' %}?model=products&type=csv" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-file-csv"></i> Products (CSV)
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if user.clientadmin.can_manage_orders %}
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'store:client_export_data' %}?model=orders&type=json" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-file-code"></i> Orders (JSON)
+                        </a>
+                        <a href="{% url 'store:client_export_data' %}?model=orders&type=csv" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-file-csv"></i> Orders (CSV)
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if user.clientadmin.can_manage_customers %}
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'store:client_export_data' %}?model=customers&type=json" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-file-code"></i> Customers (JSON)
+                        </a>
+                        <a href="{% url 'store:client_export_data' %}?model=customers&type=csv" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-file-csv"></i> Customers (CSV)
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Revenue Chart -->
+{% if user.clientadmin.can_manage_orders %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line"></i> Monthly Revenue: ₹{{ monthly_revenue|floatformat:0 }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" width="400" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if user.clientadmin.can_manage_orders %}
+<script>
+// Monthly Revenue Chart
+const ctx = document.getElementById('revenueChart').getContext('2d');
+const revenueChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+            label: 'Monthly Revenue',
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {{ monthly_revenue|floatformat:0 }}],
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₹' + value;
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %} 

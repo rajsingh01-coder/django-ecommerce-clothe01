@@ -1,29 +1,68 @@
 from django import forms
-from .models import Order, CartItem, Contact
+from .models import Order, CartItem, Contact, Category
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
 
 class CheckoutForm(forms.ModelForm):
+    payment_method = forms.ChoiceField(
+        choices=[
+            ('cod', 'Cash on Delivery'),
+            ('razorpay', 'Razorpay'),
+            ('stripe', 'Stripe'),
+            ('paypal', 'PayPal'),
+            ('upi', 'UPI'),
+            ('other', 'Other'),
+        ],
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True,
+        label='Payment Method'
+    )
     class Meta:
         model = Order
-        fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'zip_code', 'country']
+        fields = [
+            'first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'zip_code', 'country',
+            'shipping_address', 'phone_number', 'payment_method'
+        ]
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Address'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Address'}),
             'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'}),
             'state': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'State'}),
             'zip_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ZIP Code'}),
             'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Country'}),
+            'shipping_address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter your complete shipping address'
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your phone number'
+            })
         }
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+        self.fields['shipping_address'].label = 'Shipping Address'
+        self.fields['phone_number'].label = 'Phone Number'
+        self.fields['first_name'].label = 'First Name'
+        self.fields['last_name'].label = 'Last Name'
+        self.fields['email'].label = 'Email'
+        self.fields['phone'].label = 'Phone'
+        self.fields['address'].label = 'Address'
+        self.fields['city'].label = 'City'
+        self.fields['state'].label = 'State'
+        self.fields['zip_code'].label = 'ZIP Code'
+        self.fields['country'].label = 'Country'
+        # Make all new fields required
+        for field in ['first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'zip_code', 'country']:
+            self.fields[field].required = True
+        self.fields['shipping_address'].required = True
+        self.fields['phone_number'].required = True
 
 
 class CartItemForm(forms.ModelForm):
@@ -88,9 +127,7 @@ class SearchForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        from .models import Category
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = Category.objects.all()
 
 
 class ContactForm(forms.ModelForm):
